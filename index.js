@@ -1,8 +1,8 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const path = require("path");
 const connectDB = require("./config/db");
+
 const authRoutes = require("./routes/authRoutes");
 const transactionRoutes = require("./routes/transactionRoutes");
 const reportsRoutes = require("./routes/reportsRoutes");
@@ -11,27 +11,22 @@ const app = express();
 
 app.use(express.json());
 
-const allowedOrigins = [
-  "https://capita-care-frontend.vercel.app",
-  "http://localhost:5173"
-];
-
-app.use(
-  cors({
+const corsOptions = {
     origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
+        const allowedOrigins = ["https://capita-care-frontend.vercel.app", "http://localhost:5173"];
 
-      if (allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(null, false);
+        if (!origin || allowedOrigins.includes(origin)) {
+            return callback(null, true);
+        }
+        return callback(null, false);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-  })
-);
-app.options("*", cors());
+    allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 connectDB();
 
